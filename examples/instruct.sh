@@ -1,8 +1,8 @@
 #!/bin/bash
 
-TASK_ID=""
-MODEL=""
-DATASET=""
+TASK_ID="a0b6e564-b8fd-4183-aee5-1faf9aaeb03b"
+MODEL="microsoft/Phi-3-mini-128k-instruct"
+DATASET="https://s3.eu-central-003.backblazeb2.com/gradients-validator/687a16e4fbff5a30_train_data.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=00362e8d6b742200000000002%2F20260402%2Feu-central-003%2Fs3%2Faws4_request&X-Amz-Date=20260402T145147Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=a5b4b0647678cd12733ccb4c2be17fb9ee754204a93a76b64dac155f113d0a6b"
 DATASET_TYPE='{
   "field_system": null,
   "field_instruction": "instruct",
@@ -15,7 +15,7 @@ DATASET_TYPE='{
 FILE_FORMAT="s3"
 HOURS_TO_COMPLETE=2
 WANDB_TOKEN="YOUR_WANDB_TOKEN_HERE"
-HUGGINGFACE_USERNAME="Masnuy"
+HUGGINGFACE_USERNAME="Jordansky"
 HUGGINGFACE_TOKEN="YOUR_HF_TOKEN_HERE"
 EXPECTED_REPO_NAME=""
 LOCAL_FOLDER="/app/checkpoints/$TASK_ID/$EXPECTED_REPO_NAME"
