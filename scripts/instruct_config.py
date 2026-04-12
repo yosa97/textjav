@@ -160,7 +160,7 @@ def get_run_cmd(config: dict, gpu_nums: int):
     --save_strategy epoch \
     --logging_steps 5 \
     --learning_rate {learning_rate} \
-    --weight_decay 0. \
+    --weight_decay {weight_decay} \
     --warmup_steps 35 \
     --lr_scheduler_type cosine_with_min_lr \
     --lr_scheduler_kwargs "{\\"min_lr_rate\\": {min_lr_rate}}" \
@@ -199,10 +199,11 @@ def get_training_json(train_info: dict) -> dict:
     param_nums = get_model_num_params(model_name, model_path)
     config = get_instruct_config(param_nums)
     run_config = {
-        "epoch_num": 5,  # naikkan dari 3→5: 49 steps/epoch × 5 = 245 total steps, lebih optimal untuk dataset kecil
+        "epoch_num": 5,  # 49 steps/epoch × 5 = 245 total steps
         "batch_size": config["batch_size"],
         "learning_rate": config["lr"],
-        "min_lr_rate": 0.15,
+        "min_lr_rate": 0.25,  # adopt dari winner: LR minimum 25% dari LR awal
+        "weight_decay": 0.01,  # regularisasi default
         "use_liger": get_use_liger(model_architecture),
         "optimizer": "paged_adamw_8bit",
         "use_lora": config.get("use_lora", False),
@@ -278,6 +279,23 @@ def get_training_json(train_info: dict) -> dict:
             print(f"Using lr from config: {run_config['learning_rate']}", flush=True)
 
     run_config["learning_rate"] *= train_info["reg_ratio"]
+
+    # [LR-CAP] Cegah LR lookup mengembalikan nilai terlalu tinggi untuk LoRA + dataset kecil
+    # Kasus: SmolLM-1.7B → LRS lookup bisa return ~5.16e-4 → overfitting parah (eval_loss naik setelah epoch 2)
+    if config.get("use_lora", False) and param_nums < 2_000_000_000:
+        max_lr_lora = 2.5e-4  # batas atas aman untuk LoRA 1-2B
+        if run_config["learning_rate"] > max_lr_lora:
+            print(
+                f"[LR-CAP] LR {run_config['learning_rate']:.2e} melebihi batas LoRA 1-2B "
+                f"→ di-cap ke {max_lr_lora:.2e}",
+                flush=True,
+            )
+            run_config["learning_rate"] = max_lr_lora
+
+        # Tingkatkan weight_decay untuk regularisasi lebih kuat (LoRA + dataset kecil)
+        run_config["weight_decay"] = 0.05
+        print(f"[REG] weight_decay dinaikkan ke 0.05 untuk LoRA 1-2B", flush=True)
+    run_config["checking_step"] = 70
     run_cmd = get_run_cmd(run_config, run_config["gpu_nums"])
     train_request = deepcopy(train_info)
     train_request["save_before_remaining_time"] = 3
@@ -287,12 +305,12 @@ def get_training_json(train_info: dict) -> dict:
 
     if param_nums < 1_000_000_000:
         train_request["min_steps"] = max(
-            int(train_info["hours_to_complete"] * 100), train_request["min_steps"]
+            int(train_info["hours_to_complete"] * 100), train_request.get("min_steps", 0)
         )
 
     elif param_nums < 9_000_000_000:
         train_request["min_steps"] = max(
-            int(train_info["hours_to_complete"] * 70), train_request["min_steps"]
+            int(train_info["hours_to_complete"] * 70), train_request.get("min_steps", 0)
         )
 
     return {"train_request": train_request, "run_cmd": run_cmd}
