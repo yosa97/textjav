@@ -31,7 +31,7 @@ INSTRUCT_CONFIG = {
         "lr": 0.0001,
         "distributed": "ddp",
         "gpu_count": 1,
-        "use_lora": False,
+        "use_lora": True,   # aktifkan LoRA: cegah overfitting 1.7B params pada 4900 samples
         "batch_size": 100,
     },
     "2_4_b": {
@@ -168,6 +168,10 @@ def get_run_cmd(config: dict, gpu_nums: int):
     --gradient_checkpointing {gradient_checkpointing} \
     --optim {optimizer} \
     --use_liger {use_liger} \
+    --label_smoothing_factor 0.1 \
+    --max_grad_norm 0.3 \
+    --adam_beta2 0.95 \
+    --neftune_noise_alpha 5.0 \
     --packing {packing} --disable_fa {disable_fa}"""
     )
     if run_type == "ds":
@@ -195,7 +199,7 @@ def get_training_json(train_info: dict) -> dict:
     param_nums = get_model_num_params(model_name, model_path)
     config = get_instruct_config(param_nums)
     run_config = {
-        "epoch_num": 3,
+        "epoch_num": 5,  # naikkan dari 3→5: 49 steps/epoch × 5 = 245 total steps, lebih optimal untuk dataset kecil
         "batch_size": config["batch_size"],
         "learning_rate": config["lr"],
         "min_lr_rate": 0.15,

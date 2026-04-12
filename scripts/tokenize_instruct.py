@@ -166,6 +166,43 @@ def replace_wrong_token_in_item(item: dict):
             item[key] = item[key].replace("[PAD]", "")
     return item
 
+
+def apply_curriculum_sort(train_path: str):
+    """
+    Teknik Inject: Curriculum Learning
+    Sort data training dari output PENDEK (mudah) ke PANJANG (sulit).
+
+    Manfaat:
+    - Epoch awal: model belajar pola dasar dari contoh ringkas
+    - Epoch akhir: model tackle kasus kompleks setelah fondasi kuat
+    - PackedDataset: batch lebih homogen → gradient lebih stabil
+    """
+    with open(train_path, "r") as f:
+        data = json.load(f)
+
+    if not data:
+        return
+
+    # Ukuran kesulitan: panjang output string (pendek = mudah)
+    data_sorted = sorted(
+        data,
+        key=lambda x: len(str(x.get("output", "") or "")),
+        reverse=False,  # ascending: pendek → panjang
+    )
+
+    with open(train_path, "w") as f:
+        json.dump(data_sorted, f, ensure_ascii=False)
+
+    avg_len = sum(len(str(x.get("output", "") or "")) for x in data_sorted) / len(data_sorted)
+    min_len = len(str(data_sorted[0].get("output", "") or ""))
+    max_len = len(str(data_sorted[-1].get("output", "") or ""))
+    print(
+        f"[Curriculum] Sorted {len(data_sorted)} items: "
+        f"min={min_len}, avg={avg_len:.0f}, max={max_len} chars",
+        flush=True,
+    )
+
+
 def split_dataset(
     total_data_path: str,
     train_data_path: str,
