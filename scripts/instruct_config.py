@@ -295,7 +295,7 @@ def get_training_json(train_info: dict) -> dict:
         # Tingkatkan weight_decay untuk regularisasi lebih kuat (LoRA + dataset kecil)
         run_config["weight_decay"] = 0.05
         print(f"[REG] weight_decay dinaikkan ke 0.05 untuk LoRA 1-2B", flush=True)
-    run_config["checking_step"] = 70
+
     run_cmd = get_run_cmd(run_config, run_config["gpu_nums"])
     train_request = deepcopy(train_info)
     train_request["save_before_remaining_time"] = 3
