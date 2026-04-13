@@ -32,13 +32,13 @@ INSTRUCT_CONFIG = {
         "distributed": "ddp",
         "gpu_count": 1,
         "use_lora": True,   # aktifkan LoRA: cegah overfitting 1.7B params pada 4900 samples
-        "batch_size": 16,
+        "batch_size": 100,
     },
     "2_4_b": {
         "lr": 5.5e-5,
         "distributed": "ddp",
         "gpu_count": 1,
-        "batch_size": 48,
+        "batch_size": 16,
         "use_lora": True,  # cegah OOM & overfitting pada full-weight 2-4B
     },
     "4_5_b": {
