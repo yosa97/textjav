@@ -39,12 +39,14 @@ INSTRUCT_CONFIG = {
         "distributed": "ddp",
         "gpu_count": 1,
         "batch_size": 48,
+        "use_lora": True,  # cegah OOM & overfitting pada full-weight 2-4B
     },
     "4_5_b": {
         "lr": 7e-5,
         "distributed": "ddp",
         "gpu_count": 2,
         "batch_size": 40,
+        "use_lora": True,  # cegah OOM & overfitting pada full-weight 4-5B
     },
     "5_9_b": {
         "lr": 3.5e-5,
