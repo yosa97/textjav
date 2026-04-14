@@ -3,7 +3,7 @@
     "AutoTuner_MasterText": {
       "command": "python",
       "args": [
-        "c:/Users/ASUS/Documents/commit/master-text/.agent/mcp-auto-tuner/server.py"
+        "/Users/admin/Documents/text-JAV/.agent/mcp-auto-tuner/server.py"
       ],
       "env": {
         "HF_TOKEN": "ISI_DENGAN_TOKEN_WRITE_HUGGINGFACE_ANDA",
