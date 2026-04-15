@@ -194,6 +194,7 @@ def run_training(
             "WANDB_MODE": "offline",
             "WANDB_RUN_ID": f"{task_id}_{expected_repo_name}",
             "WANDB_NAME": f"{task_id}_{expected_repo_name}",
+            "TRITON_CACHE_DIR": f"/tmp/triton_cache_{task_id}",  # fix: 0 active drivers error antar subprocess
         }
 
         run_cmd_with_log(train_cmd, log_path, env_vars=training_env_vars)
