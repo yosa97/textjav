@@ -6,7 +6,7 @@ DATASET="https://s3.eu-central-003.backblazeb2.com/gradients-validator/687a16e4f
 DATASET_TYPE='{
   "field_system": null,
   "field_instruction": "instruct",
-  "field_input": null,
+  "field_input": input,
   "field_output": "output",
   "format": null,
   "no_input_format": null,
