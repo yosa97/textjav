@@ -67,5 +67,6 @@ docker run --rm --gpus all \
   --env TASK_ID="$TASK_ID" \
   --env EXPECTED_REPO_NAME="$EXPECTED_REPO_NAME" \
   --env LOCAL_FOLDER="$LOCAL_FOLDER" \
+  --env MODEL="$MODEL" \
   --name hf-uploader \
   hf-uploader
